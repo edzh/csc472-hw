@@ -63,6 +63,8 @@ void
 HW1a::initializeGL()
 {
 	// PUT YOUR CODE HERE
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glColor3f		(1.0, 1.0, 1.0);
 }
 
 
@@ -77,6 +79,11 @@ void
 HW1a::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+	glViewport(0, 0, w, h);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
 }
 
 
@@ -90,6 +97,7 @@ void
 HW1a::paintGL()
 {
 	// PUT YOUR CODE HERE
+	glClear(GL_COLOR_BUFFER_BIT);
 }
 
 
