@@ -79,11 +79,34 @@ void
 HW1a::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+	// glViewport(0, 0, w, h);
+
+	// glMatrixMode(GL_PROJECTION);
+	// glLoadIdentity();
+	// glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+	// save window dimensions
+	m_winW = w;
+	m_winH = h;
+
+	// compute aspect ratio
+	float ar = (float) w / h;
+
+	// set xmax, ymax;
+	float xmax, ymax;
+	if(ar > 1.0) {		// wide screen
+		xmax = ar;
+		ymax = 1.;
+	} else {		// tall screen
+		xmax = 1.;
+		ymax = 1 / ar;
+	}
+
+	// set viewport to occupy full canvas
 	glViewport(0, 0, w, h);
 
-	glMatrixMode(GL_PROJECTION);
+	// init viewing coordinates for orthographic projection
 	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
+	glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -98,6 +121,46 @@ HW1a::paintGL()
 {
 	// PUT YOUR CODE HERE
 	glClear(GL_COLOR_BUFFER_BIT);
+
+	glColor3f(1.0, 1.0, 1.0);
+	// glBegin(GL_LINES);
+	// for(int i = 0; i < sizeof(Vertices)/2; i++) {
+	// 	glVertex2f(Vertices[i*2], Vertices[(i*2)+1]);
+	// }
+	// glEnd();
+
+	// glBegin(GL_POLYGON);
+	// for(int i = 0; i < sizeof(Vertices)/2; i++) {
+	// 	glVertex2f(Vertices[i*2], Vertices[(i*2)+1]);
+	// }
+	// glEnd();
+
+	// glBegin(GL_TRIANGLES);
+	// for(int i = 0; i < sizeof(Vertices)/2; i++) {
+	// 	glVertex2f(Vertices[i*2], Vertices[(i*2)+1]);
+	// }
+	// glEnd();
+	// 	glBegin(GL_POINTS);
+	// for(int i = 0; i < sizeof(Vertices)/2; i++) {
+	// 	glVertex2f(Vertices[i*2], Vertices[(i*2)+1]);
+	// }
+	// glEnd();
+
+	// glBegin(GL_TRIANGLE_FAN);
+	// for(int i = 0; i < sizeof(Vertices)/2; i++) {
+	// 	glVertex2f(Vertices[i*2], Vertices[(i*2)+1]);
+	// }
+	// glEnd();
+
+	for(int i = 0; i < sizeof(DrawModes); i++) {
+		glBegin(DrawModes[i]);
+			for(int j = 0; j < sizeof(Vertices)/2; j++) {
+				glVertex2f(Vertices[j*2]/3+(0.67*i), Vertices[(j*2)+1]/3+(0.67*i));
+			}
+		glEnd();
+		glFlush();
+	}
+
 }
 
 
