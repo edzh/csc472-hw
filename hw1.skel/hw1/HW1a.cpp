@@ -79,6 +79,11 @@ void
 HW1a::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+	// glViewport(0, 0, w, h);
+
+	// glMatrixMode(GL_PROJECTION);
+	// glLoadIdentity();
+	// glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 	// save window dimensions
 	m_winW = w;
 	m_winH = h;
@@ -119,14 +124,18 @@ HW1a::paintGL()
 
 	glColor3f(1.0, 1.0, 1.0);
 
-	for(int i = 0; i < sizeof(DrawModes); i++) { // Loop through DrawModes
-		glBegin(DrawModes[i]);
-			for(int j = 0; j < sizeof(Vertices)/2; j++) {
-				glVertex2f(((Vertices[j*2]/3) - 1)+(2*(i%3)/3), Vertices[(j*2)+1]/3);
-			}
-		glEnd();
-		glFlush();
-	}
+	// for(int i = 0; i < sizeof(DrawModes); ++i) { // Loop through DrawModes
+		for(int y = 0; y < 3; ++y) {
+		for(int x = 0; x < 3; ++x) {
+			glBegin(DrawModes[3*y+x]);
+				for(int j = 0; j < 16; j++) {
+					glVertex2f( (Vertices[j*2]/3 - 1 + x), Vertices[(j*2)+1]/3 - 0.67 + y*0.67);
+				}
+			glEnd();
+			glFlush();
+		}
+		}
+	// }
 
 }
 
