@@ -92,12 +92,9 @@ HW2a::resizeGL(int w, int h)
 	// set viewport to occupy full canvas
 	glViewport(0, 0, w, h);
 
-	// compute orthographic projection from viewing coordinates;
-	// we use Qt's 4x4 matrix class in place of legacy OpenGL code:
-	// glLoadIdentity();
-	// glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
-	m_projection.setToIdentity();
-	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
+	// init viewing coordinates for orthographic projection
+	glLoadIdentity();
+	glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 
 }
 
@@ -138,9 +135,17 @@ HW2a::paintGL()
 	int h = m_winH / 3;
 
 	// use glsl program
-	glUseProgram(m_program[HW2A].programId());
+	// glUseProgram(m_program[HW2A].programId());
 	// PUT YOUR CODE HERE
 
+	for(int i = 0; i < 3; ++i) {
+		for(int j = 0; j < 3; ++j) {
+			glViewport(j*w, i*h, w, h);
+			glDrawArrays(DrawModes[3*i+j], 0, 16);
+		}
+	}
+
+	// glUseProgram(0);
 	// disable vertex shader point size adjustment
 	glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
 }
