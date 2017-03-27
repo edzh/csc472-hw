@@ -72,6 +72,33 @@ void
 HW2a::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE HERE
+	// save window dimensions
+	m_winW = w;
+	m_winH = h;
+
+	// compute aspect ratio
+	float ar = (float) w / h;
+
+	// set xmax, ymax;
+	float xmax, ymax;
+	if(ar > 1.0) {		// wide screen
+		xmax = ar;
+		ymax = 1.;
+	} else {		// tall screen
+		xmax = 1.;
+		ymax = 1 / ar;
+	}
+
+	// set viewport to occupy full canvas
+	glViewport(0, 0, w, h);
+
+	// compute orthographic projection from viewing coordinates;
+	// we use Qt's 4x4 matrix class in place of legacy OpenGL code:
+	// glLoadIdentity();
+	// glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
+	m_projection.setToIdentity();
+	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
+
 }
 
 
@@ -86,7 +113,7 @@ HW2a::paintGL()
 {
 	// clear canvas with background color
 	glClear(GL_COLOR_BUFFER_BIT);
-	
+
 	// enable vertex shader point size adjustment
 	glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 
@@ -111,6 +138,7 @@ HW2a::paintGL()
 	int h = m_winH / 3;
 
 	// use glsl program
+	glUseProgram(m_program[HW2A].programId());
 	// PUT YOUR CODE HERE
 
 	// disable vertex shader point size adjustment
@@ -190,7 +218,7 @@ HW2a::initVertexBuffer()
 	         0.5 ,  0.0 ,
 	         0.25,  0.0 ,
 	         0.0,   0.0 ,
-	        -0.25,  0.0 
+	        -0.25,  0.0
 	};
 	std::vector<float> v (&vv[0], &vv[0]+sizeof(vv)/sizeof(float));
 
