@@ -89,11 +89,11 @@ void
 HW0b::paintGL()
 {
 	// initial data
-	QVector2D v[] = {
-		QVector2D(-.25, -.25),
-		QVector2D( .25, -.25),
-		QVector2D( .15,  .25),
-		QVector2D(-.15,  .25)
+	vec2 v[] = {
+		vec2(-.25f, -.25f),
+		vec2( .25f, -.25f),
+		vec2( .15f,  .25f),
+		vec2(-.15f,  .25f)
 	};
 
 	// clear canvas with background values

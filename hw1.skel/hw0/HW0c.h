@@ -42,7 +42,6 @@ protected:
 private:
 	int		  m_winW;			// window width
 	int		  m_winH;			// window height
-	QGLShaderProgram  m_program;			// GLSL program
 	bool		  m_reverseColor;		// reverse color flag
 	QSlider		 *m_sliderTheta;		// rotation slider
 	QSpinBox	 *m_spinBoxTheta;		// rotation spinbox
@@ -50,9 +49,8 @@ private:
 	std::vector<vec2> m_points;			// vector of 2D points (XY)
 	std::vector<vec3> m_colors;			// vector of 3D colors (RGB)
 	int		  m_numPoints;			// number of 2D points
+	QMatrix4x4	  m_projection;			// 4x4 projection matrix
 	QMatrix4x4	  m_ModelMatrix;		// 4x4 transformation matrix
-	GLuint		  m_u_ModelMatrix;		// shader index to transformation matrix
-	GLuint		  m_u_reverseColor;		// shader index to color reversal flag
 	QPoint		  m_mousePosition;		// latest mouse position
 };
 

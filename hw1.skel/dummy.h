@@ -12,6 +12,8 @@
 
 #include "HW.h"
 
+extern QString GroupBoxStyle;
+
 // ----------------------------------------------------------------------
 // standard include files
 //
@@ -27,7 +29,7 @@ public:
 public slots:
 
 protected:
-	void		initializeGL	();		// init GL state
+	void		initializeGL	();		// init   GL state
 	void		resizeGL	(int, int);	// resize GL widget
 	void		paintGL		();		// render GL scene
 

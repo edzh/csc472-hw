@@ -14,9 +14,9 @@
 #include "hw0/HW0c.h"
 #include "hw1/HW1a.h"
 #include "hw1/HW1b.h"
-#ifdef USE_LATER
 #include "hw2/HW2a.h"
 #include "hw2/HW2b.h"
+#ifdef USE_LATER
 #include "hw3/HW3a.h"
 #include "hw3/HW3b.h"
 #include "hw4/HW4a.h"
@@ -45,20 +45,20 @@ MainWindow::MainWindow(QWidget *parent)
 	// set global variable for main window pointer
 	MainWindowP = this;
 
-	// create a stacked widget to hold multiple control panels/views
+	// create stacked widgets to hold multiple control panels and image displays
 	m_stackWidgetPanels= new QStackedWidget;
 	m_stackWidgetViews = new QStackedWidget;
 
-	// INSERT YOUR OBJECTS IN THIS FUNCTION
+	// create widgets, actions, and menus
 	createWidgets();	// insert your widgets here
 	createActions();	// insert your actions here
-	createMenus();		// insert your  menus  here
+	createMenus();		// insert your menus   here
 
 	// add stacked widget to vertical box layout 
 	QFrame *frame = new QFrame;
 	frame->setObjectName("frame");
 	frame->setStyleSheet(frameStyle);
-	frame->setMinimumWidth(400);
+	frame->setMinimumWidth(300);
 	QVBoxLayout *vbox = new QVBoxLayout;
 	vbox->addWidget(m_stackWidgetPanels);
 	vbox->addStretch(1);
@@ -87,7 +87,6 @@ MainWindow::MainWindow(QWidget *parent)
 // MainWindow::createWidgets:
 //
 // Create user-defined widgets for display and control panel.
-// INSERT YOUR LINES HERE TO CREATE A MENU ENTRY PER HOMEWORK OBJECT.
 //
 void
 MainWindow::createWidgets()
@@ -99,17 +98,17 @@ MainWindow::createWidgets()
 		<< "0b: Aspect ratio"
 		<< "0c: GLSL"
 		<< "1a: P"
-		<< "1b: Triangle";
-#ifdef USE_LATER
+		<< "1b: Triangle"
 		<< "2a: P (GLSL)"
-		<< "2b: Triangle (GLSL)"
+		<< "2b: Triangle (GLSL)";
+#ifdef USE_LATER
 		<< "3a: Triangle (Texture/Wire)"
 		<< "3b: Wave"
 		<< "4a: Bounce"
 		<< "4b: Shadow";
 #endif
 
-	// format for legacy OpenGL with older GLSL (supporting attribute/varying)
+	// format for legacy OpenGL with older GLSL (supporting attribute/varying qualifiers)
 	QGLFormat glfLegacy = QGLFormat::defaultFormat();	// base format
 	glfLegacy.setProfile(QGLFormat::CompatibilityProfile);	// also support legacy version
 	glfLegacy.setSampleBuffers(true);			// multisample buffer support for antialiasing (AA)
@@ -122,18 +121,19 @@ MainWindow::createWidgets()
 	glfModern.setProfile(QGLFormat::CoreProfile);		// don't use deprecated functions
 	glfModern.setSampleBuffers(true);			// multisample buffer support for antialiasing (AA)
 	glfModern.setSamples(4);				// number of samples per fragment (for AA)
+	glfModern.setSwapInterval(0);
 	glfModern.setDefaultFormat(glfModern);			// use modified parameters
 
 	// instantiate homework solution classes
 	m_hw[m_hwName[DUMMY]] = new Dummy(glfLegacy);
 	m_hw[m_hwName[HW0A ]] = new HW0a (glfLegacy);
 	m_hw[m_hwName[HW0B ]] = new HW0b (glfLegacy);
-	m_hw[m_hwName[HW0C ]] = new HW0c (glfLegacy);
+	m_hw[m_hwName[HW0C ]] = new HW0c (glfModern);
 	m_hw[m_hwName[HW1A ]] = new HW1a (glfLegacy);
 	m_hw[m_hwName[HW1B ]] = new HW1b (glfLegacy);
-#ifdef USE_LATER
 	m_hw[m_hwName[HW2A ]] = new HW2a (glfLegacy);
 	m_hw[m_hwName[HW2B ]] = new HW2b (glfModern);
+#ifdef USE_LATER
 	m_hw[m_hwName[HW3A ]] = new HW3a (glfModern);
 	m_hw[m_hwName[HW3B ]] = new HW3b (glfModern);
 	m_hw[m_hwName[HW4A ]] = new HW4a (glfLegacy);
@@ -156,7 +156,7 @@ void
 MainWindow::createActions() 
 {
 	//////////////////////////////
-	// HW 0 Actions
+	// HW 0 actions
 	//////////////////////////////
 
 	m_actionHW0a = new QAction(m_hwName[HW0A], this);
@@ -169,7 +169,7 @@ MainWindow::createActions()
 	m_actionHW0c->setData(HW0C);
 
 	//////////////////////////////
-	// HW 1 Actions
+	// HW 1 actions
 	//////////////////////////////
 
 	m_actionHW1a = new QAction(m_hwName[HW1A], this);
@@ -178,9 +178,8 @@ MainWindow::createActions()
 	m_actionHW1b = new QAction(m_hwName[HW1B], this);
 	m_actionHW1b->setData(HW1B);
 
-#ifdef USE_LATER
 	//////////////////////////////
-	// HW 2 Actions
+	// HW 2 actions
 	//////////////////////////////
 	m_actionHW2a = new QAction(m_hwName[HW2A], this);
 	m_actionHW2a->setData(HW2A);
@@ -188,8 +187,9 @@ MainWindow::createActions()
 	m_actionHW2b = new QAction(m_hwName[HW2B], this);
 	m_actionHW2b->setData(HW2B);
 
+#ifdef USE_LATER
 	//////////////////////////////
-	// HW 3 Actions
+	// HW 3 actions
 	//////////////////////////////
 	m_actionHW3a = new QAction(m_hwName[HW3A], this);
 	m_actionHW3a->setData(HW3A);
@@ -198,7 +198,7 @@ MainWindow::createActions()
 	m_actionHW3b->setData(HW3B);
 
 	//////////////////////////////
-	// HW 4 Actions
+	// HW 4 actions
 	//////////////////////////////
 	m_actionHW4a = new QAction(m_hwName[HW4A], this);
 	m_actionHW4a->setData(HW4A);
@@ -206,12 +206,10 @@ MainWindow::createActions()
 	m_actionHW4b->setData(HW4B);
 #endif
 
-
 	// one signal-slot connection for all actions;
 	// execute() will resolve which action was triggered
 	connect(menuBar(), SIGNAL(triggered(QAction*)), this, SLOT(changeHW(QAction*)));
 }
-
 
 
 
@@ -234,12 +232,12 @@ MainWindow::createMenus()
 	m_menuHW1->addAction(m_actionHW1a);
 	m_menuHW1->addAction(m_actionHW1b);
 
-#ifdef USE_LATER
 	// hw2 menu
 	m_menuHW2 = menuBar()->addMenu("HW2");
 	m_menuHW2->addAction(m_actionHW2a);
 	m_menuHW2->addAction(m_actionHW2b);
 
+#ifdef USE_LATER
 	// hw3 menu
 	m_menuHW3 = menuBar()->addMenu("HW3");
 	m_menuHW3->addAction(m_actionHW3a);
@@ -266,7 +264,6 @@ MainWindow::createGroupView()
 	QFrame *frame = new QFrame();
 	frame->setObjectName("frame");
 	frame->setStyleSheet(frameStyle);
-	
 
 	// create a stack widget to handle multiple displays
 	// one view per homework problem
@@ -284,7 +281,7 @@ MainWindow::createGroupView()
 
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-// MainWindow::changeTab:
+// MainWindow::changeHW:
 //
 // Slot function to change OpenGL canvas and control panel in stacked widget.
 //
@@ -333,8 +330,8 @@ MainWindow::createExitButtons()
 void
 MainWindow::reset()
 {
-	int index = m_stackWidgetViews->currentIndex();	// current OpenGL widget
-	m_hw[ m_hwName[index] ]->reset();
+	int index = m_stackWidgetViews->currentIndex();	// index to current OpenGL widget
+	m_hw[ m_hwName[index] ]->reset();		// invoke respective reset function
 }
 
 
@@ -350,4 +347,3 @@ MainWindow::quit()
 	// close the dialog window
 	close();
 }
-

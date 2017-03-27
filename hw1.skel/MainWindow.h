@@ -29,6 +29,7 @@
 
 enum {DUMMY, HW0A, HW0B, HW0C, HW1A, HW1B, HW2A, HW2B, HW3A, HW3B, HW4A, HW4B};
 
+
 typedef std::map<QString, HW*> hw_type;
 
 class MainWindow : public QMainWindow 

@@ -30,8 +30,8 @@ void
 HW0a::initializeGL()
 {
 	// init state variables
-	glClearColor(0.0, 0.0, 0.0, 0.0);	// set background color
-	glColor3f   (1.0, 1.0, 1.0);		// set foreground color
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);	// set background color
+	glColor3f   (1.0F, 1.0f, 1.0f);		// set foreground color
 }
 
 
@@ -69,10 +69,10 @@ HW0a::paintGL()
 
 	// define polygon
 	glBegin(GL_POLYGON);
-		glVertex2f(0.25, 0.25);
-		glVertex2f(0.75, 0.25);
-		glVertex2f(0.75, 0.75);
-		glVertex2f(0.25, 0.75);
+		glVertex2f(0.25f, 0.25f);
+		glVertex2f(0.75f, 0.25f);
+		glVertex2f(0.75f, 0.75f);
+		glVertex2f(0.25f, 0.75f);
 	glEnd();
 }
 

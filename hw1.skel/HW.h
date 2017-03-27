@@ -39,8 +39,6 @@ typedef std::map<QString, GLuint> UniformMap;
 
 extern QString GroupBoxStyle;
 
-
-
 // ----------------------------------------------------------------------
 // standard include files
 //

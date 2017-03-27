@@ -65,6 +65,24 @@ HW::reset() {}
 void
 HW::initShader(int shaderID, QString vshaderName, QString fshaderName, UniformMap uniforms)
 {
+
+
+	// due to bug in Qt, in order to use higher OpenGL version (>2.1), we need to add lines
+	// up to initShader() to render properly
+	uint vao;
+
+	typedef void (APIENTRY *_glGenVertexArrays) (GLsizei, GLuint*);
+	typedef void (APIENTRY *_glBindVertexArray) (GLuint);
+
+	_glGenVertexArrays glGenVertexArrays;
+	_glBindVertexArray glBindVertexArray;
+
+	glGenVertexArrays = (_glGenVertexArrays) QGLWidget::context()->getProcAddress("glGenVertexArrays");
+	glBindVertexArray = (_glBindVertexArray) QGLWidget::context()->getProcAddress("glBindVertexArray");
+
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+
 	// compile vertex shader
 	bool flag = m_program[shaderID].addShaderFromSourceFile(QGLShader::Vertex, vshaderName);
 	if(!flag) {

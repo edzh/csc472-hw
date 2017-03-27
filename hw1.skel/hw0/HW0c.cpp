@@ -9,6 +9,12 @@
 
 #include "HW0c.h"
 
+// shader ID
+enum { HW0D };
+
+// uniform ID
+enum { PROJ, MODEL, REVERSE };
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // HW0c::HW0c:
 //
@@ -41,9 +47,12 @@ HW0c::initializeGL()
 	// initialize vertex buffer and write positions to vertex shader
 	initVertexBuffer();
 
+	// init model matrix
+	m_ModelMatrix.setToIdentity();
+
 	// init state variables
-	glClearColor(0.0, 0.0, 0.0, 0.0);	// set background color
-	glColor3f   (1.0, 1.0, 0.0);		// set foreground color
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);	// set background color
+	glColor3f   (1.0f, 1.0f, 1.0f);		// set foreground color
 }
 
 
@@ -77,9 +86,12 @@ HW0c::resizeGL(int w, int h)
 	// set viewport to occupy full canvas
 	glViewport(0, 0, w, h);
 
-	// init viewing coordinates for orthographic projection
-	glLoadIdentity();
-	glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
+	// compute orthographic projection from viewing coordinates;
+	// we use Qt's 4x4 matrix class in place of legacy OpenGL code:
+	// glLoadIdentity();
+	// glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
+	m_projection.setToIdentity();
+	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 
 }
 
@@ -96,8 +108,20 @@ HW0c::paintGL()
 	// clear canvas with background color
 	glClear(GL_COLOR_BUFFER_BIT);
 
+	// use glsl progam
+	glUseProgram(m_program[HW0D].programId());
+
+	// pass the following parameters to vertex the shader:
+	// projection matrix, modelview matrix, and "reverse" flag
+	glUniformMatrix4fv(m_uniform[HW0D][PROJ ], 1, GL_FALSE, m_projection.constData ());
+	glUniformMatrix4fv(m_uniform[HW0D][MODEL], 1, GL_FALSE, m_ModelMatrix.constData());
+	glUniform1i	  (m_uniform[HW0D][REVERSE], m_reverseColor);
+
 	// draw triangles
 	glDrawArrays(GL_TRIANGLES, 0, 3);
+
+	// terminate program; rendering is done
+	glUseProgram(0);
 }
 
 
@@ -189,15 +213,8 @@ HW0c::reset()
 	// set "No" radio button to be default
 	m_radio[1]->setChecked(true);
 
-	// if geometry will change, call initVertexBuffer() by uncommenting next line:
-	// initVertexBuffer();
-
 	// reset 4x4 transformation matrix for model
 	m_ModelMatrix.setToIdentity();
-
-	// copy data to vertex shader
-	glUniformMatrix4fv(m_u_ModelMatrix, 1, GL_FALSE, m_ModelMatrix.constData());
-	glUniform1i(m_u_reverseColor, m_reverseColor);
 
 	// draw
 	updateGL();
@@ -213,53 +230,15 @@ HW0c::reset()
 void
 HW0c::initShaders()
 {
-	// compile vertex shader
-	if(!m_program.addShaderFromSourceFile(QGLShader::Vertex, ":/hw0/vshader0c.glsl")) {
-		QMessageBox::critical(0, "Error", "Vertex shader error", QMessageBox::Ok); 
-		QApplication::quit();
-	}
 
-	// compile fragment shader
-	if(!m_program.addShaderFromSourceFile(QGLShader::Fragment, ":/hw0/fshader0c.glsl")) {
-		QMessageBox::critical(0, "Error", "Fragment shader error",QMessageBox::Ok); 
-		QApplication::quit();
-	}
+	// init uniforms hash table based on uniform variable names and location IDs
+	UniformMap uniforms;
+	uniforms["u_ProjMatrix"  ] = PROJ;
+	uniforms["u_ModelMatrix" ] = MODEL;
+	uniforms["u_ReverseColor"] = REVERSE;
 
-	// bind the attribute variable in the glsl program with a generic vertex attribute index;
-	// values provided via ATTRIB_VERTEX will modify the value of "a_Position")
-	glBindAttribLocation(m_program.programId(), ATTRIB_VERTEX, "a_Position");
-
-	// bind the attribute variable in the glsl program with a generic vertex attribute index;
-	// values provided via ATTRIB_COLOR will modify the value of "a_Color")
-	glBindAttribLocation(m_program.programId(), ATTRIB_COLOR,  "a_Color");
-
-	// link shader pipeline; attribute bindings go into effect at this point
-	if(!m_program.link()) {
-		QMessageBox::critical(0, "Error", "Could not link shader", QMessageBox::Ok); 
-		QApplication::quit();
-	}
-
-	// bind the glsl progam
-	glUseProgram(m_program.programId());
-
-	// get storage location of u_ModelMatrix in vertex shader
-	m_u_ModelMatrix = glGetUniformLocation(m_program.programId(), "u_ModelMatrix");
-	if((int) m_u_ModelMatrix < 0) {
-		qDebug() << "Failed to get the storage location of u_ModelMatrix";
-		exit(-1);
-	}
-
-	// get storage location of u_ReverseColor in vertex shader
-	m_u_reverseColor = glGetUniformLocation(m_program.programId(), "u_ReverseColor");
-	if((int) m_u_reverseColor < 0) {
-		qDebug() << "Failed to get the storage location of u_ReverseColor";
-		exit(-1);
-	}
-
-	// init model matrix; pass it to vertex shader along with reverse color flag
-	m_ModelMatrix.setToIdentity();
-	glUniformMatrix4fv(m_u_ModelMatrix, 1, GL_FALSE, m_ModelMatrix.constData());
-	glUniform1i(m_u_reverseColor, m_reverseColor);
+	// compile shader, bind attribute vars, link shader, and initialize uniform var table
+	initShader(HW0D, QString(":/hw0/vshader0c.glsl"), QString(":/hw0/fshader0c.glsl"), uniforms);
 }
 
 
@@ -278,10 +257,10 @@ HW0c::initVertexBuffer()
 	// verify that we have valid vertex/color buffers
 	static GLuint vertexBuffer = -1;
 	static GLuint colorBuffer  = -1;
-	if(flag) {	// create vertex and color buffers
+	if(flag) {      // create vertex and color buffers
 		glGenBuffers(1, &vertexBuffer);
 		glGenBuffers(1, &colorBuffer );
-		flag = 0;	// reset flag
+		flag = 0;       // reset flag
 	}
 
 	// init geometry data
@@ -303,12 +282,10 @@ HW0c::initVertexBuffer()
 		m_points.push_back(vertices[i]);
 		m_colors.push_back(colors  [i]);
 	}
-	m_numPoints = m_points.size();		// save number of vertices
+	m_numPoints = (int) m_points.size();		// save number of vertices
 
-	// bind the buffer to the GPU; all future drawing calls gets data from this buffer
+	// bind vertex buffer to the GPU and copy the vertices from CPU to GPU
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-
-	// copy the vertices from CPU to GPU
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
 
 	// enable the assignment of attribute vertex variable
@@ -317,10 +294,8 @@ HW0c::initVertexBuffer()
 	// assign the buffer object to the attribute vertex variable
 	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
 
-	// bind color buffer to the GPU; all future buffer ops operate on this buffer
+	// bind color buffer to the GPU and copy the colors from CPU to GPU
 	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
-
-	// copy the color from CPU to GPU
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec3), colors, GL_STATIC_DRAW);
 
 	// enable the assignment of attribute color variable
@@ -359,8 +334,6 @@ HW0c::changeTheta(int angle)
 	// update model's rotation matrix
 	m_ModelMatrix.setToIdentity();
 	m_ModelMatrix.rotate(angle, QVector3D(0.0f, 0.0f, 1.0f));
-	glUniformMatrix4fv(m_u_ModelMatrix, 1, GL_FALSE, m_ModelMatrix.constData());
-	glUniform1f(m_u_reverseColor, m_reverseColor);
 
 	// draw
 	updateGL();
@@ -379,8 +352,6 @@ HW0c::reverseOn()
 	// init vars
 	m_reverseColor = true;
 
-	// redraw with flag set to 1
-	glUniform1i(m_u_reverseColor, m_reverseColor);
 	updateGL();
 }
 
@@ -397,8 +368,6 @@ HW0c::reverseOff()
 	// init vars
 	m_reverseColor = false;
 
-	// redraw with flag set to 0
-	glUniform1i(m_u_reverseColor, m_reverseColor);
 	updateGL();
 }
 

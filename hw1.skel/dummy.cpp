@@ -84,7 +84,6 @@ Dummy::paintGL()
 {
 	// clear canvas with background values
 	glClear(GL_COLOR_BUFFER_BIT);
-
 }
 
 
