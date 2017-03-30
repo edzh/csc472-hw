@@ -94,8 +94,8 @@ HW2b::resizeGL(int w, int h)
 	glViewport(0, 0, w, h);
 
 	// init viewing coordinates for orthographic projection
-	glLoadIdentity();
-	glOrtho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
+	m_projection.setToIdentity();
+	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -111,17 +111,18 @@ HW2b::paintGL()
 	// PUT YOUR CODE HERE
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUseProgram(m_program[HW2B].programId());
 
-	// for(uint i=0, j=0; i<m_colors.size(); ++i) {
-	// 	glColor3f(m_colors[i][0], m_colors[i][1], m_colors[i][2]);
+	glUniformMatrix4fv(m_uniform[HW2B][PROJ], 1, GL_FALSE, m_projection.constData());
+	glUniformMatrix4fv(m_uniform[HW2B][MV], 1, GL_FALSE, m_modelview.constData());
+	glUniform1f				(m_uniform[HW2B][THETA], m_theta);
+	glUniform1i				(m_uniform[HW2B][TWIST], m_twist);
+	// glUniform1i				(m_uniform[HW2B][SUBDIV], m_subdivisions);
 
-	// 	glBegin(GL_TRIANGLES);
-	// 		glVertex2f(m_points[j][0], m_points[j][1]); j++;
-	// 		glVertex2f(m_points[j][0], m_points[j][1]); j++;
-	// 		glVertex2f(m_points[j][0], m_points[j][1]); j++;
-	// 	glEnd();
-	// }
+
+	glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
+
+	glUseProgram(0);
 }
 
 
@@ -292,9 +293,22 @@ HW2b::initVertexBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
 
+	// enable the assignment of attribute vertex variable
+	glEnableVertexAttribArray(ATTRIB_VERTEX);
+
+	// assign the buffer object to the attribute vertex variable
+	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
+
+
 	// bind color buffer to the GPU and copy the colors from CPU to GPU
 	glBindBuffer(GL_ARRAY_BUFFER, colorBuffer);
 	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec3), &m_colors[0], GL_STATIC_DRAW);
+
+		// enable the assignment of attribute color variable
+	glEnableVertexAttribArray(ATTRIB_COLOR);
+
+	// assign the buffer object to the attribute color variable
+	glVertexAttribPointer(ATTRIB_COLOR, 3, GL_FLOAT, false, 0, NULL);
 
 	// clear vertex and color vectors because they have already been copied into GPU
 	m_points.clear();
