@@ -16,9 +16,9 @@
 #include "hw1/HW1b.h"
 #include "hw2/HW2a.h"
 #include "hw2/HW2b.h"
-#ifdef USE_LATER
 #include "hw3/HW3a.h"
 #include "hw3/HW3b.h"
+#ifdef USE_LATER
 #include "hw4/HW4a.h"
 #include "hw4/HW4b.h"
 #endif
@@ -100,10 +100,10 @@ MainWindow::createWidgets()
 		<< "1a: P"
 		<< "1b: Triangle"
 		<< "2a: P (GLSL)"
-		<< "2b: Triangle (GLSL)";
-#ifdef USE_LATER
+		<< "2b: Triangle (GLSL)"
 		<< "3a: Triangle (Texture/Wire)"
-		<< "3b: Wave"
+		<< "3b: Wave";
+#ifdef USE_LATER
 		<< "4a: Bounce"
 		<< "4b: Shadow";
 #endif
@@ -131,11 +131,11 @@ MainWindow::createWidgets()
 	m_hw[m_hwName[HW0C ]] = new HW0c (glfModern);
 	m_hw[m_hwName[HW1A ]] = new HW1a (glfLegacy);
 	m_hw[m_hwName[HW1B ]] = new HW1b (glfLegacy);
-	m_hw[m_hwName[HW2A ]] = new HW2a (glfLegacy);
+	m_hw[m_hwName[HW2A ]] = new HW2a (glfModern);
 	m_hw[m_hwName[HW2B ]] = new HW2b (glfModern);
-#ifdef USE_LATER
 	m_hw[m_hwName[HW3A ]] = new HW3a (glfModern);
 	m_hw[m_hwName[HW3B ]] = new HW3b (glfModern);
+#ifdef USE_LATER
 	m_hw[m_hwName[HW4A ]] = new HW4a (glfLegacy);
 	m_hw[m_hwName[HW4B ]] = new HW4b (glfModern);
 #endif
@@ -187,7 +187,6 @@ MainWindow::createActions()
 	m_actionHW2b = new QAction(m_hwName[HW2B], this);
 	m_actionHW2b->setData(HW2B);
 
-#ifdef USE_LATER
 	//////////////////////////////
 	// HW 3 actions
 	//////////////////////////////
@@ -197,6 +196,7 @@ MainWindow::createActions()
 	m_actionHW3b = new QAction(m_hwName[HW3B], this);
 	m_actionHW3b->setData(HW3B);
 
+#ifdef USE_LATER
 	//////////////////////////////
 	// HW 4 actions
 	//////////////////////////////
@@ -237,12 +237,12 @@ MainWindow::createMenus()
 	m_menuHW2->addAction(m_actionHW2a);
 	m_menuHW2->addAction(m_actionHW2b);
 
-#ifdef USE_LATER
 	// hw3 menu
 	m_menuHW3 = menuBar()->addMenu("HW3");
 	m_menuHW3->addAction(m_actionHW3a);
 	m_menuHW3->addAction(m_actionHW3b);
 
+#ifdef USE_LATER
 	// hw4 menu
 	m_menuHW4 = menuBar()->addMenu("HW4");
 	m_menuHW4->addAction(m_actionHW4a);
