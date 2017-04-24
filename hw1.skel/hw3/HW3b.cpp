@@ -82,7 +82,7 @@ HW3b::initializeGL()
 	// create light
 	m_light = new Light;
 
-	// set light position and direction	
+	// set light position and direction
 	m_light->set (vec3(1.0f, -2.0f, 2.0f), vec3(0, 0, 0));
 
 	// enable depth buffer
@@ -110,6 +110,28 @@ void
 HW3b::resizeGL(int w, int h)
 {
 	// PUT YOUR CODE (use perspective projection)
+		// save window dimensions
+	m_winW = w;
+	m_winH = h;
+
+	// compute aspect ratio
+	float ar = (float) w / h;
+	float xmax, ymax;
+	if(ar > 1.0) {		// wide screen
+		xmax = ar;
+		ymax = 1.;
+	}
+	else {			// tall screen
+		xmax = 1.;
+		ymax = 1 / ar;
+	}
+
+	// set viewport to occupy full canvas
+	glViewport(0, 0, w, h);
+
+	// init viewing coordinates for orthographic projection
+	m_projection.setToIdentity();
+	m_projection.ortho(-xmax, xmax, -ymax, ymax, -1.0, 1.0);
 }
 
 
@@ -156,6 +178,8 @@ HW3b::paintGL()
 	case TEXTURED:
 		// draw textured surface
 		// PUT YOUR CODE HERE
+		glUseProgram(m_program[TEXTURED].programId());
+
 		if(m_displayMode != TEXTURED_WIREFRAME)
 			break;
 	case WIREFRAME:
@@ -163,7 +187,7 @@ HW3b::paintGL()
 		// PUT YOUR CODE HERE
 		break;
 	case FLAT_COLOR:
-		glUseProgram(m_program[FLAT_SHADER].programId());	
+		glUseProgram(m_program[FLAT_SHADER].programId());
 		glUniformMatrix4fv(m_uniform[FLAT_SHADER][VIEW ], 1, GL_FALSE, m_camera->view().constData());
 		glUniformMatrix4fv(m_uniform[FLAT_SHADER][PROJ ], 1, GL_FALSE, m_projection.constData());
 		glUniform3fv(m_uniform[FLAT_SHADER][LIGHTDIR], 1, &m_light->eye()[0]);
@@ -171,7 +195,7 @@ HW3b::paintGL()
 		glDrawElements(GL_TRIANGLE_STRIP, (GLsizei) m_indices_triangles.size(), GL_UNSIGNED_SHORT, 0);
 		break;
 	case SMOOTH_COLOR:
-		glUseProgram(m_program[SMOOTH_SHADER].programId());	
+		glUseProgram(m_program[SMOOTH_SHADER].programId());
 		glUniformMatrix4fv(m_uniform[SMOOTH_SHADER][VIEW ], 1, GL_FALSE, m_camera->view().constData());
 		glUniformMatrix4fv(m_uniform[SMOOTH_SHADER][PROJ ], 1, GL_FALSE, m_projection.constData());
 		glUniform3fv(m_uniform[FLAT_SHADER][LIGHTDIR], 1, &m_light->eye()[0]);
@@ -180,7 +204,7 @@ HW3b::paintGL()
 		break;
 	case SMOOTH_TEXTURE:
 		glBindTexture(GL_TEXTURE_2D, m_texture);
-		glUseProgram(m_program[SMOOTH_TEX].programId());	
+		glUseProgram(m_program[SMOOTH_TEX].programId());
 		glUniformMatrix4fv(m_uniform[SMOOTH_TEX][VIEW ], 1, GL_FALSE, m_camera->view().constData());
 		glUniformMatrix4fv(m_uniform[SMOOTH_TEX][PROJ ], 1, GL_FALSE, m_projection.constData());
 		glUniform3fv(m_uniform[SMOOTH_TEX][LIGHTDIR], 1, &m_light->eye()[0]);
@@ -488,7 +512,7 @@ void HW3b::getPosition()
 // Virtual function called when timer times out.
 // We use it to stop timer, recompute surface heights, and restart timer.
 //
-void 
+void
 HW3b::timeOut()
 {
 	// pause animation to reset grid without interruption by timer
@@ -673,7 +697,7 @@ HW3b::initVertices()
 
 
 // face normals - for flat shading
-void 
+void
 HW3b::getFaceNorms()
 {
 
@@ -707,7 +731,7 @@ HW3b::getFaceNorms()
 
 
 // vertex normals - average of face normals for smooth shading
-void 
+void
 HW3b::getVertNorms()
 {
 	for(int i = 0; i < m_grid; ++i) {
@@ -1015,7 +1039,7 @@ HW3b::changeSpeed(int val)
 //
 // Play/pause animation timer.
 //
-void 
+void
 HW3b::playPauseAnimation()
 {
 	if(m_wave) {
@@ -1038,7 +1062,7 @@ HW3b::playPauseAnimation()
 //
 // Mouse press event handler.
 //
-void 
+void
 HW3b::mousePressEvent(QMouseEvent *e)
 {
 	// save mouse press position

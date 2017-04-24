@@ -120,41 +120,33 @@ HW3a::paintGL()
 	// clear canvas with background color
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	// set flag for creating buffers (1st time only)
-	static bool flag = 1;
+	// // bind vertex buffer to the GPU; enable buffer to be copied to the
+	// // attribute vertex variable and specify data format
+	// // PUT YOUR CODE HERE
+	// glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	// glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
+	// glEnableVertexAttribArray(ATTRIB_VERTEX);
+	// glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
 
-	// verify that we have valid vertex/color buffers
-	static GLuint vertexBuffer = -1;
-	static GLuint textureBuffer = -1;
-	if(flag) {      // create vertex and color buffers
-		glGenBuffers(1, &vertexBuffer);
-		glGenBuffers(1, &textureBuffer);
-		flag = 0;       // reset flag
-	}
-
-
-	// bind vertex buffer to the GPU; enable buffer to be copied to the
-	// attribute vertex variable and specify data format
-	// PUT YOUR CODE HERE
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
-	glEnableVertexAttribArray(ATTRIB_VERTEX);
-	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
-	// bind texture coord buffer to the GPU; enable buffer to be copied to the
-	// attribute texture coordinate variable and specify data format
-	// PUT YOUR CODE HERE
-	glBindBuffer(GL_ARRAY_BUFFER, textureBuffer);
-	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
+	// // bind texture coord buffer to the GPU; enable buffer to be copied to the
+	// // attribute texture coordinate variable and specify data format
+	// // PUT YOUR CODE HERE
+	// glBindBuffer(GL_ARRAY_BUFFER, m_texBuffer);
+	// glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_coords[0], GL_STATIC_DRAW);
+	// glEnableVertexAttribArray(ATTRIB_TEXCOORD);
+	// glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, false, 0, NULL);
 
 	// use texture glsl program
 	// PUT YOUR CODE HERE
 	glUseProgram(m_program[TEXTURE].programId());
+
+	// pass parameters to vertex shader
+	// PUT YOUR CODE HERE
 	glUniformMatrix4fv(m_uniform[TEXTURE][PROJ], 1, GL_FALSE, m_projection.constData());
 	glUniformMatrix4fv(m_uniform[TEXTURE][MV], 1, GL_FALSE, m_modelview.constData());
 	glUniform1f				(m_uniform[TEXTURE][THETA], m_theta);
 	glUniform1i				(m_uniform[TEXTURE][TWIST], m_twist);
-	// pass parameters to vertex shader
-	// PUT YOUR CODE HERE
+	glUniform1i				(m_uniform[TEXTURE][SAMPLER], 0);
 
 	// draw texture mapped triangles
 	// PUT YOUR CODE HERE
@@ -169,8 +161,11 @@ HW3a::paintGL()
 		glUniformMatrix4fv(m_uniform[WIREFRAME][MV], 1, GL_FALSE, m_modelview.constData());
 		glUniform1f				(m_uniform[WIREFRAME][THETA], m_theta);
 		glUniform1i				(m_uniform[WIREFRAME][TWIST], m_twist);
-		glDrawArrays(GL_LINES, 0, m_numPoints);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glDrawArrays(GL_TRIANGLES, 0, m_numPoints);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	}
+	glUseProgram(0);
 }
 
 
@@ -376,20 +371,26 @@ HW3a::initVertexBuffer()
 	// recursively subdivide triangle into triangular facets;
 	// store vertex positions and colors in m_points and m_colors, respectively
 	divideTriangle(vertices[0], vertices[1], vertices[2], m_subdivisions);
-	m_numPoints = (int) m_points.size();		// save number of vertices
+	m_numPoints = (int) m_coords.size();		// save number of vertices
 
-	// // bind vertex buffer to the GPU and copy the vertices from CPU to GPU
-	// glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	// glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
+	// bind vertex buffer to the GPU; enable buffer to be copied to the
+	// attribute vertex variable and specify data format
+	// PUT YOUR CODE HERE
+	glBindBuffer(GL_ARRAY_BUFFER, m_vertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_points[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(ATTRIB_VERTEX);
+	glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
 
-	// // enable the assignment of attribute vertex variable
-	// glEnableVertexAttribArray(ATTRIB_VERTEX);
+	// bind texture coord buffer to the GPU; enable buffer to be copied to the
+	// attribute texture coordinate variable and specify data format
+	// PUT YOUR CODE HERE
+	glBindBuffer(GL_ARRAY_BUFFER, m_texBuffer);
+	glBufferData(GL_ARRAY_BUFFER, m_numPoints*sizeof(vec2), &m_coords[0], GL_STATIC_DRAW);
+	glEnableVertexAttribArray(ATTRIB_TEXCOORD);
+	glVertexAttribPointer(ATTRIB_TEXCOORD, 2, GL_FLOAT, false, 0, NULL);
 
-	// // assign the buffer object to the attribute vertex variable
-	// glVertexAttribPointer(ATTRIB_VERTEX, 2, GL_FLOAT, false, 0, NULL);
-
-	// // clear vertex and color vectors because they have already been copied into GPU
-	// m_points.clear();
+	m_points.clear();
+	m_coords.clear();
 }
 
 
