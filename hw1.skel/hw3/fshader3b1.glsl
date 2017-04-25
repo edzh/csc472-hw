@@ -1,8 +1,11 @@
 #version 330
 
-// PUT YOUR CODE HERE
+in  vec2    v_TexCoord;
+out vec4    fragColor;
 
-void main() 
+uniform sampler2D u_Sampler;  // uniform variable for the texture image
+
+void main()
 {
-	// PUT YOUR CODE HERE
+  fragColor = texture(u_Sampler, v_TexCoord);
 }
