@@ -1,11 +1,9 @@
 #version 330
 
-in  vec2    v_TexCoord;
-out vec4    fragColor;
-
-uniform sampler2D u_Sampler;  // uniform variable for the texture image
+out vec4 fragColor;
 
 void main()
 {
-  fragColor = texture(u_Sampler, v_TexCoord);
+  fragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }
+
