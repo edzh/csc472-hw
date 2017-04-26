@@ -195,6 +195,7 @@ HW3b::paintGL()
 		glUniformMatrix4fv(m_uniform[WIREFRAME][VIEW], 1, GL_FALSE, m_camera->view().constData());
 		glUniformMatrix4fv(m_uniform[WIREFRAME][PROJ], 1, GL_FALSE, m_projection.constData());
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indicesBuffer[0]);
+
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDrawElements(GL_TRIANGLE_STRIP, (GLsizei) m_indices_triangles.size(), GL_UNSIGNED_SHORT, 0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
